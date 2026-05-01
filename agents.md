@@ -3,43 +3,38 @@
 ## SolidityAgent
 - Ruolo: Progetta e implementa smart contract in Solidity usando OpenZeppelin.
 - Obiettivi:
-  - Creare un token ERC20 **aggiornabile** usando i contratti upgradeable di OpenZeppelin.
-  - Usare pattern proxy (UUPS o Transparent) con inizializzatore al posto del costruttore.
-  - Implementare funzioni di `mint` e `burn` con regole di sicurezza chiare.
+  - Creare un token ERC20 **upgradeable** per Polygon Amoy testnet.
+  - Usare `@openzeppelin/contracts-upgradeable` con pattern **UUPSUpgradeable** e inizializzatore.
+  - Implementare `mint` e `burn` con regole di sicurezza solide.
 - Regole di sicurezza:
-  - `mint` consentito solo a ruoli autorizzati (`MINTER_ROLE`) o `onlyOwner`, mai pubblico.
-  - `burn` consentito solo sul proprio saldo (`msg.sender`) o con controlli espliciti.
-  - Usare `AccessControl` o `Ownable` per la gestione dei permessi.
-  - Prevedere eventi per `Mint`, `Burn`, `RoleGranted`, `RoleRevoked`.
+  - `mint` consentito solo a chi possiede `MINTER_ROLE` (AccessControlUpgradeable).
+  - `burn` consentito solo a `msg.sender` sul proprio saldo.
+  - Uso di `AccessControlUpgradeable` per ruoli e permessi, nessuna funzione “aperta” al pubblico.
+  - Emissione eventi per `Mint`, `Burn`, gestione ruoli.
+- Target chain:
+  - Polygon Amoy testnet (chainId 80002, RPC es. https://rpc-amoy.polygon.technology).
 - Cartella di lavoro: `./solidity`
 
 ## SolidityTestAgent
 - Ruolo: Scrive e mantiene i test per gli smart contract.
 - Obiettivi:
-  - Testare correttamente `mint`, `burn`, trasferimenti e permessi.
-  - Verificare che solo gli account autorizzati possano chiamare `mint`.
-  - Verificare che `burn` non permetta di bruciare più del saldo disponibile.
-  - Testare l’aggiornabilità del contratto (deploy proxy, upgrade, stato preservato).
+  - Testare `mint`, `burn`, trasferimenti e permessi.
+  - Verificare che solo gli account con `MINTER_ROLE` possano fare `mint`.
+  - Verificare che `burn` non permetta di bruciare più del saldo.
+  - Testare l’upgrade del contratto (deploy proxy UUPS, upgrade, stato preservato).
 - Cartella di lavoro: `./solidity/test`
 
 ## FrontendAgent
 - Ruolo: Implementa il frontend per la gestione del token.
 - Obiettivi:
-  - Creare una UI per:
-    - mint (solo per account autorizzati),
-    - burn (sul proprio saldo),
-    - lettura balance, totalSupply e altri attributi,
-    - chiamata dei metodi di amministrazione se previsti.
-  - Usare React (o Vite+React) ed `ethers.js` (o libreria equivalente).
-  - Collegarsi al contratto tramite ABI e address del proxy.
+  - UI per mint (solo minter), burn, lettura balance, totalSupply e altri metodi.
+  - Usare React (Vite+React) ed `ethers`.
+  - Collegarsi al contratto tramite ABI e address del **proxy** su Amoy.
 - Cartella di lavoro: `./frontend`
 
 ## IntegrationAgent
 - Ruolo: Coordina integrazione tra smart contract e frontend.
 - Obiettivi:
-  - Documentare il flusso: deploy del proxy → address → configurazione nel frontend.
+  - Documentare il flusso: deploy su Amoy → address proxy → configurazione frontend.
   - Mantenere aggiornati ABI e indirizzi nel frontend dopo ogni upgrade.
-  - Aggiornare il README con i comandi per:
-    - deploy,
-    - test,
-    - avvio del frontend.
+  - Aggiornare README con comandi per deploy, test e avvio frontend.
